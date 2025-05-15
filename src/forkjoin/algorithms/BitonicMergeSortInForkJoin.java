@@ -29,28 +29,26 @@ public class BitonicMergeSortInForkJoin extends RecursiveAction {
                 new BitonicMergeSortInForkJoin(bitMergArray, lowerIndex + midIndx, lenCount - midIndx, false)
         );
 
-        bitonicMerge(bitMergArray, lowerIndex, lenCount, asc);
+        bitonicMergSortParalel(bitMergArray, lowerIndex, lenCount, asc);
     }
 
-    private void bitonicMerge(int[] array, int low, int lenCount, boolean asc) {
+    private void bitonicMergSortParalel(int[] bitMergArray, int low, int lenCount, boolean asc) {
         if (lenCount <= 1) return;
 
         int midIndx = lenCount / 2;
 
         for (int i = low; i < low + midIndx; i++) {
-            if ((asc && array[i] > array[i + midIndx]) || (!asc && array[i] < array[i + midIndx])) {
-                int temp = array[i];
-                array[i] = array[i + midIndx];
-                array[i + midIndx] = temp;
+            if ((asc && bitMergArray[i] > bitMergArray[i + midIndx]) || (!asc && bitMergArray[i] < bitMergArray[i + midIndx])) {
+                UtilityMethods.swapping(bitMergArray,i,i+midIndx);
             }
         }
 
-        bitonicMerge(array, low, midIndx, asc);
-        bitonicMerge(array, low + midIndx, lenCount - midIndx, asc);
+        bitonicMergSortParalel(bitMergArray, low, midIndx, asc);
+        bitonicMergSortParalel(bitMergArray, low + midIndx, lenCount - midIndx, asc);
     }
 
     public static void main(String[] args) {
-        int[] bitMergeSort = UtilityMethods.randomlyGeneratedArray(16384);
+        int[] bitMergeSort = UtilityMethods.randomlyGeneratedArray(16384);//2^14 : only power of 2 used for this algo
 
         ForkJoinPool pool = new ForkJoinPool();
         long start = System.nanoTime();
@@ -58,8 +56,10 @@ public class BitonicMergeSortInForkJoin extends RecursiveAction {
         long end = System.nanoTime();
 
         System.out.println("Bitonic Sort Time: " + (end - start) / 1e6 + " ms and size of input " + bitMergeSort.length);
-        //System.out.println("Is array sorted? " + UtilityMethods.isArraySrted(bitMergeSort));
+        //System.out.print(Arrays.toString(mergeArray)); //to check if it is sorted or not
 
         pool.shutdown();
+
+        System.out.println("Is array sorted? " + UtilityMethods.isArraySrted(bitMergeSort));
     }
 }
